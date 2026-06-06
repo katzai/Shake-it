@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Romantic Surprise ❤️</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+overflow:hidden;
+background:linear-gradient(45deg,#ff69b4,#ff1493,#ffb6c1);
+background-size:400% 400%;
+animation:bgMove 8s infinite alternate;
+height:100vh;
+}
+
+@keyframes bgMove{
+0%{background-position:0% 50%;}
+100%{background-position:100% 50%;}
+}
+
+.hearts{
+position:fixed;
+width:100%;
+height:100%;
+pointer-events:none;
+overflow:hidden;
+}
+
+.heart{
+position:absolute;
+font-size:25px;
+animation:float 6s linear infinite;
+opacity:.7;
+}
+
+@keyframes float{
+0%{
+transform:translateY(100vh);
+opacity:0;
+}
+100%{
+transform:translateY(-100px);
+opacity:1;
+}
+}
+
+#instruction{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+font-size:2rem;
+font-weight:bold;
+color:white;
+text-align:center;
+text-shadow:0 0 20px #fff;
+z-index:20;
+animation:pulse 1s infinite;
+}
+
+@keyframes pulse{
+50%{
+transform:translate(-50%,-50%) scale(1.08);
+}
+}
+
+#container{
+position:fixed;
+inset:0;
+display:none;
+}
+
+#image1{
+position:absolute;
+width:100%;
+height:100%;
+object-fit:cover;
+clip-path:inset(100% 0 0 0);
+}
+
+#image2{
+position:absolute;
+width:100%;
+height:100%;
+object-fit:cover;
+opacity:0;
+transition:opacity 2s;
+}
+
+.waterFill{
+animation:fillUp 4s forwards;
+}
+
+@keyframes fillUp{
+from{
+clip-path:inset(100% 0 0 0);
+}
+to{
+clip-path:inset(0 0 0 0);
+}
+}
+
+.fadeIn{
+opacity:1 !important;
+}
+
+#overlayText{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+color:white;
+font-size:3rem;
+font-weight:bold;
+text-shadow:0 0 20px black;
+z-index:10;
+display:none;
+}
+</style>
+</head>
+<body>
+
+<div class="hearts" id="hearts"></div>
+
+<div id="instruction">
+📳 SHAKE THE PHONE<br>
+AS FAST AS YOU CAN ❤️
+</div>
+
+<div id="container">
+<img src="first.jpg" id="image1">
+<img src="second.jpg" id="image2">
+<div id="overlayText">❤️</div>
+</div>
+
+<script>
+
+const hearts=document.getElementById("hearts");
+
+for(let i=0;i<50;i++){
+let h=document.createElement("div");
+h.className="heart";
+h.innerHTML="💖";
+h.style.left=Math.random()*100+"%";
+h.style.animationDuration=(4+Math.random()*5)+"s";
+h.style.fontSize=(20+Math.random()*30)+"px";
+hearts.appendChild(h);
+}
+
+let shakeCount=0;
+let lastX,lastY,lastZ;
+let started=false;
+
+function startSequence(){
+
+if(started) return;
+started=true;
+
+document.getElementById("instruction").style.display="none";
+document.getElementById("container").style.display="block";
+
+let img1=document.getElementById("image1");
+img1.classList.add("waterFill");
+
+navigator.vibrate([
+100,50,100,50,100,50,100,50,
+100,50,100,50,100,50,100,50,
+100,50,100,50,100,50,100
+]);
+
+setTimeout(()=>{
+navigator.vibrate(3000);
+},4000);
+
+setTimeout(()=>{
+document.getElementById("image2")
+.classList.add("fadeIn");
+},9000);
+
+}
+
+window.addEventListener("devicemotion",(e)=>{
+
+let acc=e.accelerationIncludingGravity;
+
+if(!acc) return;
+
+if(lastX!==undefined){
+
+let delta=
+Math.abs(acc.x-lastX)+
+Math.abs(acc.y-lastY)+
+Math.abs(acc.z-lastZ);
+
+if(delta>20){
+
+shakeCount++;
+
+navigator.vibrate(80);
+
+if(shakeCount>12){
+startSequence();
+}
+}
+}
+
+lastX=acc.x;
+lastY=acc.y;
+lastZ=acc.z;
+
+});
+
+if(typeof DeviceMotionEvent!=="undefined" &&
+typeof DeviceMotionEvent.requestPermission==="function"){
+
+document.body.addEventListener("click",()=>{
+
+DeviceMotionEvent.requestPermission()
+.then(response=>{
+
+if(response==="granted"){
+console.log("Motion Granted");
+}
+
+});
+
+},{once:true});
+
+}
+
+</script>
+
+</body>
+</html>
