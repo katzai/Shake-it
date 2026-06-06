@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Romantic Surprise</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+html,body{
+width:100%;
+height:100%;
+overflow:hidden;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:linear-gradient(45deg,#ff69b4,#ff1493,#ffc0cb);
+background-size:400% 400%;
+animation:bg 8s infinite alternate;
+}
+
+@keyframes bg{
+0%{background-position:0% 50%;}
+100%{background-position:100% 50%;}
+}
+
+#message{
+position:fixed;
+inset:0;
+display:flex;
+justify-content:center;
+align-items:center;
+text-align:center;
+font-size:2rem;
+font-weight:bold;
+color:white;
+text-shadow:0 0 15px black;
+z-index:100;
+}
+
+#scene{
+display:none;
+position:fixed;
+inset:0;
+}
+
+img{
+position:absolute;
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
+#img1{
+clip-path:inset(100% 0 0 0);
+}
+
+#img2{
+opacity:0;
+transition:2s;
+}
+
+.heart{
+position:absolute;
+font-size:30px;
+animation:float 5s linear infinite;
+pointer-events:none;
+}
+
+@keyframes float{
+from{
+transform:translateY(100vh);
+}
+to{
+transform:translateY(-100px);
+}
+}
+</style>
+</head>
+
+<body>
+
+<div id="message">
+💖 SHAKE THE PHONE AS FAST AS YOU CAN 💖
+</div>
+
+<div id="scene">
+<img src="first.jpg" id="img1">
+<img src="second.jpg" id="img2">
+</div>
+
+<script>
+
+for(let i=0;i<50;i++){
+const h=document.createElement("div");
+h.className="heart";
+h.innerHTML="💖";
+h.style.left=Math.random()*100+"%";
+h.style.animationDelay=Math.random()*5+"s";
+document.body.appendChild(h);
+}
+
+let started=false;
+let shakeCount=0;
+let lastX,lastY,lastZ;
+
+function startAnimation(){
+
+if(started) return;
+started=true;
+
+document.getElementById("message").style.display="none";
+document.getElementById("scene").style.display="block";
+
+let fill=0;
+
+let water=setInterval(()=>{
+
+fill+=2;
+
+document.getElementById("img1").style.clipPath=
+`inset(${100-fill}% 0 0 0)`;
+
+if(fill>=100){
+
+clearInterval(water);
+
+if(navigator.vibrate){
+navigator.vibrate(3000);
+}
+
+setTimeout(()=>{
+
+document.getElementById("img2").style.opacity="1";
+
+},5000);
+}
+
+},80);
+}
+
+window.addEventListener("devicemotion",(e)=>{
+
+const a=e.accelerationIncludingGravity;
+
+if(!a) return;
+
+if(lastX!=null){
+
+const speed=
+Math.abs(a.x-lastX)+
+Math.abs(a.y-lastY)+
+Math.abs(a.z-lastZ);
+
+if(speed>15){
+
+shakeCount++;
+
+if(navigator.vibrate){
+navigator.vibrate(50);
+}
+
+if(shakeCount>12){
+startAnimation();
+}
+}
+}
+
+lastX=a.x;
+lastY=a.y;
+lastZ=a.z;
+
+});
+
+/* fallback if motion blocked */
+setTimeout(()=>{
+if(!started){
+startAnimation();
+}
+},3000);
+
+</script>
+
+</body>
+</html>
